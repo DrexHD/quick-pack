@@ -1,0 +1,3 @@
+accessWidener v1 named
+accessible    class    net/minecraft/server/packs/FilePackResources$SharedZipFileAccess
+accessible    method     net/minecraft/server/packs/FilePackResources$SharedZipFileAccess    <init>    (Ljava/io/File;)V

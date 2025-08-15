@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "quick-pack",
+	"version": "${version}",
+	"name": "quick-pack",
+	"description": "Improve datapack / resourcepack zip file loading times",
+	"authors": [
+		"Drex"
+	],
+	"license": "MIT",
+	"icon": "assets/quick-pack/icon.png",
+	"environment": "*",
+	"entrypoints": {
+	},
+	"accessWidener": "quick-pack.accesswidener",
+	"mixins": [
+		"quick-pack.mixins.json",
+		{
+			"config": "quick-pack.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.17.2",
+		"java": ">=21"
+	}
+}
