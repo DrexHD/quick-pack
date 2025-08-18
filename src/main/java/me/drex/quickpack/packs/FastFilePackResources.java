@@ -98,7 +98,7 @@ public class FastFilePackResources extends AbstractPackResources {
 
     @Override
     public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
-        String namespacePrefix = packType.getDirectory() + "/" + namespace + "/";
+        String namespacePrefix = addPrefix(packType.getDirectory() + "/" + namespace + "/");
         String dirPrefix = namespacePrefix + path + "/";
         String end = dirPrefix + Character.MAX_VALUE;
         fileMap.subMap(dirPrefix, end).forEach((filePath, bytes) -> {
