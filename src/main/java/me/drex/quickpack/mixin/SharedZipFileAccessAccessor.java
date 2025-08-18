@@ -1,4 +1,4 @@
-package me.drex.quickpack.mixin.client;
+package me.drex.quickpack.mixin;
 
 import net.minecraft.server.packs.FilePackResources;
 import org.spongepowered.asm.mixin.Mixin;

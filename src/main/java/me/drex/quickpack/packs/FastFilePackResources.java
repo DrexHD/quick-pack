@@ -1,7 +1,7 @@
 package me.drex.quickpack.packs;
 
 import com.mojang.logging.LogUtils;
-import me.drex.quickpack.mixin.client.SharedZipFileAccessAccessor;
+import me.drex.quickpack.mixin.SharedZipFileAccessAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.AbstractPackResources;
 import net.minecraft.server.packs.FilePackResources;

@@ -1,4 +1,4 @@
-package me.drex.quickpack.mixin.client;
+package me.drex.quickpack.mixin;
 
 import me.drex.quickpack.packs.FastFilePackResources;
 import net.minecraft.server.packs.CompositePackResources;
