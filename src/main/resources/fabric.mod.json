@@ -12,13 +12,8 @@
 	"environment": "*",
 	"entrypoints": {
 	},
-	"accessWidener": "quick-pack.accesswidener",
 	"mixins": [
-		"quick-pack.mixins.json",
-		{
-			"config": "quick-pack.client.mixins.json",
-			"environment": "client"
-		}
+		"quick-pack.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.17.2",

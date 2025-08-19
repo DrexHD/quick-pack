@@ -28,8 +28,6 @@ loom {
 			sourceSet sourceSets.client
 		}
 	}
-
-	accessWidenerPath.set(file("src/main/resources/quick-pack.accesswidener"))
 }
 
 dependencies {
