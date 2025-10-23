@@ -71,9 +71,17 @@ jar {
 publishMods {
 	file = remapJar.archiveFile
 	type = STABLE
-	changelog = ""
+	changelog = providers.environmentVariable("CHANGELOG").getOrElse("No changelog provided")
 
 	displayName = "quick-pack ${version.get()}"
+	modLoaders.add("fabric")
+	modLoaders.add("quilt")
+
+	modrinth {
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+		projectId = "pSISfJ4O"
+		minecraftVersions.add(project.minecraft_version)
+	}
 
 	github {
 		accessToken = providers.environmentVariable("GITHUB_TOKEN")
