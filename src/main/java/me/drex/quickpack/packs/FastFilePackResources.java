@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -20,19 +21,19 @@ public class FastFilePackResources extends AbstractPackResources {
 
     private final TreeMap<String, byte[]> fileMap = new TreeMap<>();
     private final Map<String, Set<String>> namespaces = new HashMap<>();
-    private final ZipFile zipFile;
+    private ZipFile zipFile = null;
     private final List<String> prefixStack;
-    private final Set<String> overlays;
+    private final Set<String> overlays = Collections.emptySet();
 
-    public FastFilePackResources(PackLocationInfo packLocationInfo, ZipFile zipFile, List<String> overlays) {
-        super(packLocationInfo);
-        this.zipFile = zipFile;
-
-        this.overlays = new HashSet<>(overlays);
-        prefixStack = new ArrayList<>(overlays.size() + 1);
-        for (int i = overlays.size() - 1; i >= 0; i--) {
-            prefixStack.add(overlays.get(i) + "/");
+    public FastFilePackResources(String name, File file, boolean isBuiltin) {
+        super(name, isBuiltin);
+        try {
+            this.zipFile = new ZipFile(file);
+        } catch (IOException e) {
+            LOGGER.error("Failed to open pack {}", file, e);
         }
+
+        prefixStack = new ArrayList<>(1);
         prefixStack.add("");
 
         extractFiles();
@@ -74,10 +75,10 @@ public class FastFilePackResources extends AbstractPackResources {
             return;
         }
 
-        if (ResourceLocation.isValidNamespace(namespace)) {
+        if (namespace.equals(namespace.toLowerCase(Locale.ROOT))) {
             namespaces.computeIfAbsent(type, s -> new HashSet<>()).add(namespace);
         } else {
-            LOGGER.warn("Non [a-z0-9_.-] character in namespace {} in pack {}, ignoring", namespace, zipFile);
+            LOGGER.warn("Ignored non-lowercase namespace: {} in {}", namespace, zipFile);
         }
     }
 

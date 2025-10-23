@@ -1,37 +1,23 @@
 package me.drex.quickpack.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import me.drex.quickpack.packs.FastFilePackResources;
-import net.minecraft.server.packs.FilePackResources;
-import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
-import net.minecraft.server.packs.repository.Pack;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.server.packs.repository.FolderRepositorySource;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.zip.ZipFile;
 
-@Mixin(FilePackResources.FileResourcesSupplier.class)
+@Mixin(FolderRepositorySource.class)
 public abstract class FileResourcesSupplierMixin {
-    @Shadow @Final private File content;
 
-    /**
-     * @author drex
-     * @reason Use optimized FastFilePackResources
-     */
-    @Overwrite
-    public PackResources openFull(PackLocationInfo packLocationInfo, Pack.Metadata metadata) {
-        ZipFile zipFile = null;
-        try {
-            zipFile = new ZipFile(this.content);
-        } catch (IOException e) {
-            FastFilePackResources.LOGGER.error("Failed to open pack {}", this.content, e);
-        }
-        List<String> overlays = metadata.overlays();
-        return new FastFilePackResources(packLocationInfo, zipFile, overlays);
+    @ModifyReturnValue(method = "method_45268", at = @At("TAIL"))
+    private static PackResources useFastFilePackResources(
+        PackResources original, @Local(argsOnly = true) String name, @Local(argsOnly = true) File file,
+        @Local(argsOnly = true) boolean isBuiltin
+    ) {
+        return new FastFilePackResources(name, file, isBuiltin);
     }
 }
