@@ -1,0 +1,13 @@
+modLoader="javafml"
+loaderVersion="*"
+license="MIT"
+
+[[mods]]
+modId="quick_pack"
+version="${modVersion}"
+displayName="quick-pack"
+authors="Drex"
+logoFile = "assets/quick-pack/icon.png"
+logoBlur = false
+
+description='''Improve datapack / resourcepack zip file loading times'''
