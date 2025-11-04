@@ -13,7 +13,13 @@ import java.io.File;
 @Mixin(FolderRepositorySource.class)
 public abstract class FileResourcesSupplierMixin {
 
-    @ModifyReturnValue(method = "method_45268", at = @At("TAIL"))
+    @ModifyReturnValue(
+        method = {
+            "method_45268", // fabric
+            "lambda$detectPackResources$2" // forge
+        },
+        at = @At("TAIL")
+    )
     private static PackResources useFastFilePackResources(
         PackResources original, @Local(argsOnly = true) String name, @Local(argsOnly = true) File file,
         @Local(argsOnly = true) boolean isBuiltin

@@ -1,11 +1,12 @@
 {
   "required": true,
   "package": "me.drex.quickpack.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "FileResourcesSupplierMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-	}
+  },
+  "refmap": "quick-pack.refmap.json"
 }

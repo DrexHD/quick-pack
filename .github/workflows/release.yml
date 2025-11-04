@@ -8,11 +8,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
-          java-version: 21
+          java-version: 17
       - uses: FabricMC/fabric-action-scripts@v2
         id: changelog
         with:
