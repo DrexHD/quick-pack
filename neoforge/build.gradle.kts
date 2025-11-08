@@ -14,6 +14,6 @@ dependencies {
 publishMods {
     file.set(tasks.jar.get().archiveFile)
 
-    displayName.set("quick-pack neoforge $version")
+    displayName.set("quick-pack neoforge ${version.get()}")
     modLoaders.addAll("neoforge")
 }

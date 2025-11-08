@@ -45,6 +45,6 @@ mixin {
 publishMods {
     file.set(tasks.jarJar.get().archiveFile)
 
-    displayName.set("quick-pack forge $version")
+    displayName.set("quick-pack forge ${version.get()}")
     modLoaders.addAll("forge")
 }
