@@ -23,6 +23,7 @@ jobs:
       - name: Publish mods
         run: ./gradlew publishMods
         env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CHANGELOG: ${{ steps.changelog.outputs.changelog }}
