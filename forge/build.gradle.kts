@@ -16,8 +16,10 @@ plugins {
     id("multiloader-loader")
 }
 
+version = "forge-${project.property("mod_version")}+${project.property("minecraft_version")}"
+
 base {
-    archivesName = "${project.property("archives_base_name")}-forge"
+    archivesName = "${project.property("archives_base_name")}"
 }
 
 minecraft {
@@ -45,6 +47,6 @@ mixin {
 publishMods {
     file.set(tasks.jarJar.get().archiveFile)
 
-    displayName.set("quick-pack forge ${version.get()}")
+    displayName.set("quick-pack ${version.get()}")
     modLoaders.addAll("forge")
 }

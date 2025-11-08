@@ -5,8 +5,10 @@ plugins {
     id("multiloader-loader")
 }
 
+version = "fabric-${project.property("mod_version")}+${project.property("minecraft_version")}"
+
 base {
-    archivesName = "${project.property("archives_base_name")}-fabric"
+    archivesName = "${project.property("archives_base_name")}"
 }
 
 dependencies {
@@ -19,6 +21,6 @@ dependencies {
 publishMods {
     file.set(tasks.remapJar.get().archiveFile)
 
-    displayName.set("quick-pack fabric ${version.get()}")
+    displayName.set("quick-pack ${version.get()}")
     modLoaders.addAll("fabric", "quilt")
 }
