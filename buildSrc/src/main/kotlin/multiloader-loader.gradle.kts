@@ -32,6 +32,7 @@ tasks {
 
     publishMods {
         type.set(STABLE)
+        displayName.set("quick-pack ${version.get()}")
         changelog.set(providers.environmentVariable("CHANGELOG").orElse("No changelog provided"))
 
         curseforge {

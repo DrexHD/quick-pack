@@ -3,8 +3,10 @@ plugins {
     id("net.neoforged.gradle.userdev") version "7.0.192"
 }
 
+version = "neoforge-${project.property("mod_version")}+${project.property("minecraft_version")}"
+
 base {
-    archivesName = "${project.property("archives_base_name")}-neoforge"
+    archivesName = "${project.property("archives_base_name")}"
 }
 
 dependencies {
@@ -14,6 +16,6 @@ dependencies {
 publishMods {
     file.set(tasks.jar.get().archiveFile)
 
-    displayName.set("quick-pack neoforge ${version.get()}")
+    displayName.set("quick-pack ${version.get()}")
     modLoaders.addAll("neoforge")
 }
