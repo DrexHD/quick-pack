@@ -19,6 +19,6 @@ dependencies {
 publishMods {
     file.set(tasks.remapJar.get().archiveFile)
 
-    displayName.set("quick-pack fabric $version")
+    displayName.set("quick-pack fabric ${version.get()}")
     modLoaders.addAll("fabric", "quilt")
 }
