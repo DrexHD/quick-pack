@@ -44,6 +44,14 @@ mixin {
     config("quick-pack.mixins.json")
 }
 
+tasks.jar.configure {
+    finalizedBy("reobfJar")
+}
+
+tasks.jarJar.configure {
+    finalizedBy("reobfJarJar")
+}
+
 publishMods {
     file.set(tasks.jarJar.get().archiveFile)
 
