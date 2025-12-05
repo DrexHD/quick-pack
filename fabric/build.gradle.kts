@@ -1,5 +1,3 @@
-import kotlin.collections.addAll
-
 plugins {
     id("fabric-loom")
     id("multiloader-loader")

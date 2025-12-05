@@ -1,6 +1,6 @@
 plugins {
     id("multiloader-loader")
-    id("net.neoforged.gradle.userdev") version "7.0.192"
+    id("net.neoforged.gradle.userdev") version "7.1.4"
 }
 
 version = "neoforge-${project.property("mod_version")}+${project.property("minecraft_version")}"

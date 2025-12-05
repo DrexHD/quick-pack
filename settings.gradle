@@ -15,11 +15,11 @@ pluginManagement {
 }
 
 plugins {
-    id("fabric-loom") version "1.12-SNAPSHOT" apply false
+    id("fabric-loom") version "1.14-SNAPSHOT" apply false
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0" apply false
 }
 
 include 'common'
 include 'fabric'
 //include 'forge'
-include 'neoforge'
+//include 'neoforge'
