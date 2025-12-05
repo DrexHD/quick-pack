@@ -3,9 +3,7 @@ package me.drex.quickpack.packs;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.*;
-import net.minecraft.server.packs.resources.IoSupplier;
 import org.apache.commons.io.IOUtils;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
@@ -13,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -25,8 +24,8 @@ public class FastFilePackResources extends AbstractPackResources {
     private final List<String> prefixStack;
     private final Set<String> overlays = Collections.emptySet();
 
-    public FastFilePackResources(String name, File file, boolean isBuiltin) {
-        super(name, isBuiltin);
+    public FastFilePackResources(File file) {
+        super(file);
         try {
             this.zipFile = new ZipFile(file);
         } catch (IOException e) {
@@ -83,41 +82,26 @@ public class FastFilePackResources extends AbstractPackResources {
     }
 
     @Override
-    public @Nullable IoSupplier<InputStream> getRootResource(String... parts) {
-        byte[] data = fileMap.get(String.join("/", parts));
-        if (data == null) return null;
-        return () -> new ByteArrayInputStream(data);
-    }
-
-    @Override
-    public @Nullable IoSupplier<InputStream> getResource(PackType packType, ResourceLocation resourceLocation) {
-        for (String prefix : prefixStack) {
-            byte[] data = fileMap.get(prefix + packType.getDirectory() + "/" + resourceLocation.getNamespace() + "/" + resourceLocation.getPath());
-            if (data == null) continue;
-            return () -> new ByteArrayInputStream(data);
-        }
-        return null;
-    }
-
-    @Override
-    public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
-        Map<ResourceLocation, IoSupplier<InputStream>> map = new HashMap<>();
+    public Collection<ResourceLocation> getResources(PackType packType, String namespace, String path, Predicate<ResourceLocation> predicate) {
+        List<ResourceLocation> list = new LinkedList<>();
 
         for (String prefix : prefixStack) {
             String namespacePrefix = prefix + packType.getDirectory() + "/" + namespace + "/";
             String dirPrefix = namespacePrefix + path + "/";
             String end = dirPrefix + Character.MAX_VALUE;
             fileMap.subMap(dirPrefix, end).forEach((filePath, bytes) -> {
+                if (filePath.endsWith(".mcmeta")) return;
+
                 String rlPath = filePath.substring(namespacePrefix.length());
                 ResourceLocation location = ResourceLocation.tryBuild(namespace, rlPath);
-                if (location != null) {
-                    map.putIfAbsent(location, () -> new ByteArrayInputStream(bytes));
-                } else {
+                if (location == null) {
                     LOGGER.warn("Invalid path in datapack: {}:{}, ignoring", namespace, rlPath);
+                } else if (predicate.test(location)) {
+                    list.add(location);
                 }
             });
         }
-        map.forEach(resourceOutput);
+        return list;
     }
 
     @Override
@@ -130,5 +114,25 @@ public class FastFilePackResources extends AbstractPackResources {
         if (zipFile != null) {
             IOUtils.closeQuietly(this.zipFile);
         }
+    }
+
+    @Override
+    protected InputStream getResource(String string) throws IOException {
+        for (String prefix : prefixStack) {
+            byte[] data = fileMap.get(prefix + string);
+            if (data == null) continue;
+            return new ByteArrayInputStream(data);
+        }
+        throw new ResourcePackFileNotFoundException(this.file, string);
+    }
+
+    @Override
+    protected boolean hasResource(String string) {
+        for (String prefix : prefixStack) {
+            byte[] data = fileMap.get(prefix + string);
+            if (data == null) continue;
+            return true;
+        }
+        return false;
     }
 }

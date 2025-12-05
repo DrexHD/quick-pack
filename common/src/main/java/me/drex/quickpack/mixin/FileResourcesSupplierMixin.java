@@ -15,15 +15,14 @@ public abstract class FileResourcesSupplierMixin {
 
     @ModifyReturnValue(
         method = {
-            "method_45268", // fabric
-            "lambda$detectPackResources$2" // forge
+            "method_14434", // fabric
+            "lambda$createSupplier$1" // forge
         },
         at = @At("TAIL")
     )
     private static PackResources useFastFilePackResources(
-        PackResources original, @Local(argsOnly = true) String name, @Local(argsOnly = true) File file,
-        @Local(argsOnly = true) boolean isBuiltin
+        PackResources original, @Local(argsOnly = true) File file
     ) {
-        return new FastFilePackResources(name, file, isBuiltin);
+        return new FastFilePackResources(file);
     }
 }
