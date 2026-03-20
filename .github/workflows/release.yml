@@ -1,5 +1,5 @@
 name: release
-on: [ workflow_dispatch ]
+on: [workflow_dispatch]
 
 jobs:
   release:
@@ -8,11 +8,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up JDK 21
+      - name: setup jdk
         uses: actions/setup-java@v4
         with:
-          distribution: 'adopt'
-          java-version: 21
+          java-version: '25'
+          distribution: 'microsoft'
       - uses: FabricMC/fabric-action-scripts@v2
         id: changelog
         with:

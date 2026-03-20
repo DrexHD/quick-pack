@@ -1,5 +1,5 @@
 plugins {
-    id("fabric-loom")
+    id("net.fabricmc.fabric-loom")
     id("multiloader-common")
 }
 
@@ -9,9 +9,8 @@ base {
 
 dependencies {
     minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
-    mappings(loom.officialMojangMappings())
 
-    modCompileOnly("net.fabricmc:fabric-loader:${project.property("loader_version")}")
+    compileOnly("net.fabricmc:fabric-loader:${project.property("loader_version")}")
 }
 
 val commonJava: Configuration by configurations.creating {
