@@ -6,7 +6,6 @@ import net.minecraft.server.packs.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +17,7 @@ import java.util.zip.ZipFile;
 public class FastFilePackResources extends AbstractPackResources {
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private final TreeMap<String, byte[]> fileMap = new TreeMap<>();
+    private final TreeSet<String> fileTree = new TreeSet<>();
     private final Map<String, Set<String>> namespaces = new HashMap<>();
     private ZipFile zipFile = null;
     private final List<String> prefixStack;
@@ -35,11 +34,13 @@ public class FastFilePackResources extends AbstractPackResources {
         prefixStack = new ArrayList<>(1);
         prefixStack.add("");
 
-        extractFiles();
+        iterateFiles();
     }
 
-    public void extractFiles() {
-        if (zipFile == null) return;
+    private void iterateFiles() {
+        if (zipFile == null) {
+            return;
+        }
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
@@ -48,12 +49,7 @@ public class FastFilePackResources extends AbstractPackResources {
             String path = entry.getName();
             extractNamespace(path);
 
-            try (InputStream in = zipFile.getInputStream(entry)) {
-                byte[] data = in.readAllBytes();
-                fileMap.put(path, data);
-            } catch (IOException e) {
-                FastFilePackResources.LOGGER.error("Failed to load resource {}", path, e);
-            }
+            fileTree.add(path);
         }
     }
 
@@ -89,7 +85,7 @@ public class FastFilePackResources extends AbstractPackResources {
             String namespacePrefix = prefix + packType.getDirectory() + "/" + namespace + "/";
             String dirPrefix = namespacePrefix + path + "/";
             String end = dirPrefix + Character.MAX_VALUE;
-            fileMap.subMap(dirPrefix, end).forEach((filePath, bytes) -> {
+            fileTree.subSet(dirPrefix, end).forEach((filePath) -> {
                 if (filePath.endsWith(".mcmeta")) return;
 
                 String rlPath = filePath.substring(namespacePrefix.length());
@@ -118,10 +114,11 @@ public class FastFilePackResources extends AbstractPackResources {
 
     @Override
     protected InputStream getResource(String string) throws IOException {
-        for (String prefix : prefixStack) {
-            byte[] data = fileMap.get(prefix + string);
-            if (data == null) continue;
-            return new ByteArrayInputStream(data);
+        if (zipFile != null) {
+            for (String prefix : prefixStack) {
+                ZipEntry entry = zipFile.getEntry(prefix + string);
+                return zipFile.getInputStream(entry);
+            }
         }
         throw new ResourcePackFileNotFoundException(this.file, string);
     }
@@ -129,9 +126,8 @@ public class FastFilePackResources extends AbstractPackResources {
     @Override
     protected boolean hasResource(String string) {
         for (String prefix : prefixStack) {
-            byte[] data = fileMap.get(prefix + string);
-            if (data == null) continue;
-            return true;
+            boolean contained = fileTree.contains(prefix + string);
+            if (contained) return true;
         }
         return false;
     }
