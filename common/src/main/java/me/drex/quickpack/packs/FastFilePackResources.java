@@ -8,8 +8,6 @@ import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -18,7 +16,7 @@ import java.util.zip.ZipFile;
 public class FastFilePackResources extends AbstractPackResources {
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private final TreeMap<String, byte[]> fileMap = new TreeMap<>();
+    private final TreeSet<String> fileTree = new TreeSet<>();
     private final Map<String, Set<String>> namespaces = new HashMap<>();
     private final ZipFile zipFile;
     private final List<String> prefixStack;
@@ -35,11 +33,13 @@ public class FastFilePackResources extends AbstractPackResources {
         }
         prefixStack.add("");
 
-        extractFiles();
+        iterateFiles();
     }
 
-    public void extractFiles() {
-        if (zipFile == null) return;
+    private void iterateFiles() {
+        if (zipFile == null) {
+            return;
+        }
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
@@ -48,12 +48,7 @@ public class FastFilePackResources extends AbstractPackResources {
             String path = entry.getName();
             extractNamespace(path);
 
-            try (InputStream in = zipFile.getInputStream(entry)) {
-                byte[] data = in.readAllBytes();
-                fileMap.put(path, data);
-            } catch (IOException e) {
-                FastFilePackResources.LOGGER.error("Failed to load resource {}", path, e);
-            }
+            fileTree.add(path);
         }
     }
 
@@ -83,19 +78,29 @@ public class FastFilePackResources extends AbstractPackResources {
 
     @Override
     public @Nullable IoSupplier<InputStream> getRootResource(String... parts) {
-        byte[] data = fileMap.get(String.join("/", parts));
-        if (data == null) return null;
-        return () -> new ByteArrayInputStream(data);
+        return getResource(String.join("/", parts));
     }
 
     @Override
     public @Nullable IoSupplier<InputStream> getResource(PackType packType, Identifier resourceLocation) {
         for (String prefix : prefixStack) {
-            byte[] data = fileMap.get(prefix + packType.getDirectory() + "/" + resourceLocation.getNamespace() + "/" + resourceLocation.getPath());
-            if (data == null) continue;
-            return () -> new ByteArrayInputStream(data);
+            IoSupplier<InputStream> supplier = getResource(prefix + packType.getDirectory() + "/" + resourceLocation.getNamespace() + "/" + resourceLocation.getPath());
+            if (supplier == null) continue;
+            return supplier;
+
         }
         return null;
+    }
+
+    private IoSupplier<InputStream> getResource(String path) {
+        if (zipFile == null) {
+            return null;
+        }
+        ZipEntry entry = zipFile.getEntry(path);
+        if (entry == null) {
+            return null;
+        }
+        return IoSupplier.create(zipFile, entry);
     }
 
     @Override
@@ -106,11 +111,11 @@ public class FastFilePackResources extends AbstractPackResources {
             String namespacePrefix = prefix + packType.getDirectory() + "/" + namespace + "/";
             String dirPrefix = namespacePrefix + path + "/";
             String end = dirPrefix + Character.MAX_VALUE;
-            fileMap.subMap(dirPrefix, end).forEach((filePath, bytes) -> {
+            fileTree.subSet(dirPrefix, end).forEach((filePath) -> {
                 String rlPath = filePath.substring(namespacePrefix.length());
                 Identifier location = Identifier.tryBuild(namespace, rlPath);
                 if (location != null) {
-                    map.putIfAbsent(location, () -> new ByteArrayInputStream(bytes));
+                    map.putIfAbsent(location, getResource(filePath));
                 } else {
                     LOGGER.warn("Invalid path in datapack: {}:{}, ignoring", namespace, rlPath);
                 }
