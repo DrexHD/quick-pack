@@ -17,11 +17,12 @@ import java.util.zip.ZipFile;
 public class FastFilePackResources extends AbstractPackResources {
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private final TreeSet<String> fileTree = new TreeSet<>();
-    private final Map<String, Set<String>> namespaces = new HashMap<>();
+    private TreeSet<String> fileTree = new TreeSet<>();
+    private Map<String, Set<String>> namespaces = new HashMap<>();
     private ZipFile zipFile = null;
     private final List<String> prefixStack;
     private final Set<String> overlays = Collections.emptySet();
+    private boolean extracted = false;
 
     public FastFilePackResources(File file) {
         super(file);
@@ -33,11 +34,11 @@ public class FastFilePackResources extends AbstractPackResources {
 
         prefixStack = new ArrayList<>(1);
         prefixStack.add("");
-
-        iterateFiles();
     }
 
-    private void iterateFiles() {
+    private void ensureFileTree() {
+        if (extracted) return;
+        extracted = true;
         if (zipFile == null) {
             return;
         }
@@ -79,6 +80,7 @@ public class FastFilePackResources extends AbstractPackResources {
 
     @Override
     public Collection<ResourceLocation> getResources(PackType packType, String namespace, String path, Predicate<ResourceLocation> predicate) {
+        ensureFileTree();
         List<ResourceLocation> list = new LinkedList<>();
 
         for (String prefix : prefixStack) {
@@ -102,6 +104,7 @@ public class FastFilePackResources extends AbstractPackResources {
 
     @Override
     public Set<String> getNamespaces(PackType packType) {
+        ensureFileTree();
         return namespaces.getOrDefault(packType.getDirectory(), Collections.emptySet());
     }
 
@@ -109,6 +112,9 @@ public class FastFilePackResources extends AbstractPackResources {
     public void close() {
         if (zipFile != null) {
             IOUtils.closeQuietly(this.zipFile);
+            zipFile = null;
+            namespaces = null;
+            fileTree = null;
         }
     }
 
