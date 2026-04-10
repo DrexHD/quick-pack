@@ -16,11 +16,12 @@ import java.util.zip.ZipFile;
 public class FastFilePackResources extends AbstractPackResources {
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private final TreeSet<String> fileTree = new TreeSet<>();
-    private final Map<String, Set<String>> namespaces = new HashMap<>();
-    private final ZipFile zipFile;
+    private TreeSet<String> fileTree = new TreeSet<>();
+    private Map<String, Set<String>> namespaces = new HashMap<>();
+    private ZipFile zipFile;
     private final List<String> prefixStack;
     private final Set<String> overlays;
+    private boolean extracted = false;
 
     public FastFilePackResources(PackLocationInfo packLocationInfo, ZipFile zipFile, List<String> overlays) {
         super(packLocationInfo);
@@ -32,11 +33,11 @@ public class FastFilePackResources extends AbstractPackResources {
             prefixStack.add(overlays.get(i) + "/");
         }
         prefixStack.add("");
-
-        iterateFiles();
     }
 
-    private void iterateFiles() {
+    private void ensureFileTree() {
+        if (extracted) return;
+        extracted = true;
         if (zipFile == null) {
             return;
         }
@@ -105,6 +106,7 @@ public class FastFilePackResources extends AbstractPackResources {
 
     @Override
     public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
+        ensureFileTree();
         Map<Identifier, IoSupplier<InputStream>> map = new HashMap<>();
 
         for (String prefix : prefixStack) {
@@ -126,6 +128,7 @@ public class FastFilePackResources extends AbstractPackResources {
 
     @Override
     public Set<String> getNamespaces(PackType packType) {
+        ensureFileTree();
         return namespaces.getOrDefault(packType.getDirectory(), Collections.emptySet());
     }
 
@@ -133,6 +136,9 @@ public class FastFilePackResources extends AbstractPackResources {
     public void close() {
         if (zipFile != null) {
             IOUtils.closeQuietly(this.zipFile);
+            zipFile = null;
+            namespaces = null;
+            fileTree = null;
         }
     }
 }
