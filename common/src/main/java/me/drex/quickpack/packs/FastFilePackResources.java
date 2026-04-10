@@ -1,7 +1,7 @@
 package me.drex.quickpack.packs;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.apache.commons.io.IOUtils;
@@ -73,7 +73,7 @@ public class FastFilePackResources extends AbstractPackResources {
             return;
         }
 
-        if (Identifier.isValidNamespace(namespace)) {
+        if (ResourceLocation.isValidNamespace(namespace)) {
             namespaces.computeIfAbsent(type, s -> new HashSet<>()).add(namespace);
         } else {
             LOGGER.warn("Non [a-z0-9_.-] character in namespace {} in pack {}, ignoring", namespace, zipFile);
@@ -86,7 +86,7 @@ public class FastFilePackResources extends AbstractPackResources {
     }
 
     @Override
-    public @Nullable IoSupplier<InputStream> getResource(PackType packType, Identifier resourceLocation) {
+    public @Nullable IoSupplier<InputStream> getResource(PackType packType, ResourceLocation resourceLocation) {
         for (String prefix : prefixStack) {
             IoSupplier<InputStream> supplier = getResource(prefix + packType.getDirectory() + "/" + resourceLocation.getNamespace() + "/" + resourceLocation.getPath());
             if (supplier == null) continue;
@@ -110,7 +110,7 @@ public class FastFilePackResources extends AbstractPackResources {
     @Override
     public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
         ensureFileTree();
-        Map<Identifier, IoSupplier<InputStream>> map = new HashMap<>();
+        Map<ResourceLocation, IoSupplier<InputStream>> map = new HashMap<>();
 
         for (String prefix : prefixStack) {
             String namespacePrefix = prefix + packType.getDirectory() + "/" + namespace + "/";
@@ -118,7 +118,7 @@ public class FastFilePackResources extends AbstractPackResources {
             String end = dirPrefix + Character.MAX_VALUE;
             fileTree.subSet(dirPrefix, end).forEach((filePath) -> {
                 String rlPath = filePath.substring(namespacePrefix.length());
-                Identifier location = Identifier.tryBuild(namespace, rlPath);
+                ResourceLocation location = ResourceLocation.tryBuild(namespace, rlPath);
                 if (location != null) {
                     map.putIfAbsent(location, getResource(filePath));
                 } else {
