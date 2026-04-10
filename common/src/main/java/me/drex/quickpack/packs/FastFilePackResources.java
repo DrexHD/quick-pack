@@ -44,9 +44,12 @@ public class FastFilePackResources extends AbstractPackResources {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            if (entry.isDirectory()) continue;
 
             String path = entry.getName();
+            if (entry.isDirectory()) {
+                path = path.substring(0, path.length() - 1);
+            }
+
             extractNamespace(path);
 
             fileTree.add(path);
