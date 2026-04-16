@@ -8,8 +8,5 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "quick-pack.refmap.json",
-  "client": [
-    "LoadingOverlayMixin"
-  ]
+  "refmap": "quick-pack.refmap.json"
 }
