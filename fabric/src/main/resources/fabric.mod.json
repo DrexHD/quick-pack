@@ -11,6 +11,9 @@
 	"icon": "assets/quick-pack/icon.png",
 	"environment": "*",
 	"entrypoints": {
+		"main": [
+			"me.drex.quickpack.fabric.QuickPackFabric"
+		]
 	},
 	"mixins": [
 		"quick-pack.mixins.json"
