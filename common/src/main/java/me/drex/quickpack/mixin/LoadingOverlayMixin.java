@@ -30,7 +30,7 @@ public abstract class LoadingOverlayMixin {
     private boolean removeFadeOut(final LoadingOverlay instance, Operation<Boolean> original) {
         if (ConfigManager.config.removeLoadingOverlayFadeOut) {
             this.minecraft.setOverlay(null);
-            return true;
+            return false;
         }
         return original.call(instance);
     }
