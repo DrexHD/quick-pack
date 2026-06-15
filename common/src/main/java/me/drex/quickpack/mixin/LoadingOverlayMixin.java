@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(LoadingOverlay.class)
 public abstract class LoadingOverlayMixin {
@@ -27,7 +26,7 @@ public abstract class LoadingOverlayMixin {
     )
     private boolean removeFadeOut(LoadingOverlay instance, Operation<Boolean> original) {
         if (ConfigManager.config.removeLoadingOverlayFadeOut) {
-            this.minecraft.setOverlay(null);
+            this.minecraft.gui.setOverlay(null);
             return true;
         }
         return original.call(instance);
