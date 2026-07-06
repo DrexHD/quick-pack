@@ -1,14 +1,16 @@
 {
   "required": true,
   "package": "me.drex.quickpack.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8.5",
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  },
   "mixins": [
     "FileResourcesSupplierMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "quick-pack.refmap.json",
   "client": [
     "LoadingOverlayMixin"
   ]
