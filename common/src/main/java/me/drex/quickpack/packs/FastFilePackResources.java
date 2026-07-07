@@ -82,13 +82,13 @@ public class FastFilePackResources extends AbstractPackResources {
 
     @Override
     public @Nullable IoSupplier<InputStream> getRootResource(String... parts) {
-        return getResource(String.join("/", parts));
+        return getResource(String.join("/", parts), true);
     }
 
     @Override
     public @Nullable IoSupplier<InputStream> getResource(PackType packType, Identifier resourceLocation) {
         for (String prefix : prefixStack) {
-            IoSupplier<InputStream> supplier = getResource(prefix + packType.getDirectory() + "/" + resourceLocation.getNamespace() + "/" + resourceLocation.getPath());
+            IoSupplier<InputStream> supplier = getResource(prefix + packType.getDirectory() + "/" + resourceLocation.getNamespace() + "/" + resourceLocation.getPath(), true);
             if (supplier == null) continue;
             return supplier;
 
@@ -96,12 +96,15 @@ public class FastFilePackResources extends AbstractPackResources {
         return null;
     }
 
-    private IoSupplier<InputStream> getResource(String path) {
+    private IoSupplier<InputStream> getResource(String path, boolean allowDirectory) {
         if (zipFile == null) {
             return null;
         }
         ZipEntry entry = zipFile.getEntry(path);
         if (entry == null) {
+            return null;
+        }
+        if (entry.isDirectory() && !allowDirectory) {
             return null;
         }
         return IoSupplier.create(zipFile, entry);
@@ -120,7 +123,10 @@ public class FastFilePackResources extends AbstractPackResources {
                 String rlPath = filePath.substring(namespacePrefix.length());
                 Identifier location = Identifier.tryBuild(namespace, rlPath);
                 if (location != null) {
-                    map.putIfAbsent(location, getResource(filePath));
+                    IoSupplier<InputStream> resource = getResource(filePath, false);
+                    if (resource != null) {
+                        map.putIfAbsent(location, resource);
+                    }
                 } else {
                     LOGGER.warn("Invalid path in datapack: {}:{}, ignoring", namespace, rlPath);
                 }
