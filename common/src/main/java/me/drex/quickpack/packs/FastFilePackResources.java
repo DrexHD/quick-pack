@@ -91,6 +91,12 @@ public class FastFilePackResources extends AbstractPackResources {
             String dirPrefix = namespacePrefix + path + "/";
             String end = dirPrefix + Character.MAX_VALUE;
             fileTree.subSet(dirPrefix, end).forEach((filePath) -> {
+                if (zipFile != null) {
+                    ZipEntry zipEntry = zipFile.getEntry(filePath);
+                    if (zipEntry != null && zipEntry.isDirectory()) {
+                        return;
+                    }
+                }
                 if (filePath.endsWith(".mcmeta")) return;
 
                 String rlPath = filePath.substring(namespacePrefix.length());
