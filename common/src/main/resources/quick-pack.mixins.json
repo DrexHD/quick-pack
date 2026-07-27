@@ -12,6 +12,7 @@
     "defaultRequire": 1
   },
   "client": [
-    "LoadingOverlayMixin"
+    "LoadingOverlayMixin",
+    "GuiMixin"
   ]
 }
