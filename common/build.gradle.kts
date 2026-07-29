@@ -13,6 +13,10 @@ dependencies {
     compileOnly("net.fabricmc:fabric-loader:${project.property("loader_version")}")
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/quick-pack.classtweaker")
+}
+
 val commonJava: Configuration by configurations.creating {
     isCanBeResolved = false
     isCanBeConsumed = true

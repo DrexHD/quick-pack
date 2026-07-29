@@ -6,13 +6,16 @@
     "minVersion": "0.5.0"
   },
   "mixins": [
-    "FileResourcesSupplierMixin"
+    "FilePackResourcesAccessor",
+    "FilePackResourcesMixin",
+    "FileResourcesSupplierMixin",
+    "SharedZipFileAccessAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "LoadingOverlayMixin",
-    "GuiMixin"
+    "GuiMixin",
+    "LoadingOverlayMixin"
   ]
 }

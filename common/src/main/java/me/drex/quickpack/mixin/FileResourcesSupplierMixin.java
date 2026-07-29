@@ -1,37 +1,40 @@
 package me.drex.quickpack.mixin;
 
-import me.drex.quickpack.packs.FastFilePackResources;
+import com.llamalad7.mixinextras.sugar.Local;
+import me.drex.quickpack.QuickPack;
 import net.minecraft.server.packs.FilePackResources;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.repository.Pack;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipFile;
 
 @Mixin(FilePackResources.FileResourcesSupplier.class)
 public abstract class FileResourcesSupplierMixin {
-    @Shadow @Final private File content;
+    @Inject(method = "openFull", at = @At(value = "RETURN", ordinal = 0))
+    public void initializeFileTree(
+        PackLocationInfo location, Pack.Metadata metadata, CallbackInfoReturnable<PackResources> cir,
+        @Local(name = "primary") PackResources primary,
+        @Local(name = "fileAccess") FilePackResources.SharedZipFileAccess zipFileAccess
+    ) {
+        QuickPack.initializeFileTrees(zipFileAccess, List.of(primary));
+    }
 
-    /**
-     * @author drex
-     * @reason Use optimized FastFilePackResources
-     */
-    @Overwrite
-    public PackResources openFull(PackLocationInfo packLocationInfo, Pack.Metadata metadata) {
-        ZipFile zipFile = null;
-        try {
-            zipFile = new ZipFile(this.content);
-        } catch (IOException e) {
-            FastFilePackResources.LOGGER.error("Failed to open pack {}", this.content, e);
-        }
-        List<String> overlays = metadata.overlays();
-        return new FastFilePackResources(packLocationInfo, zipFile, overlays);
+    @Inject(method = "openFull", at = @At(value = "RETURN", ordinal = 1))
+    public void initializeFileTrees(
+        PackLocationInfo location, Pack.Metadata metadata, CallbackInfoReturnable<PackResources> cir,
+        @Local(name = "primary") PackResources primary,
+        @Local(name = "overlayResources") List<PackResources> overlayResources,
+        @Local(name = "fileAccess") FilePackResources.SharedZipFileAccess zipFileAccess
+    ) {
+        List<PackResources> packList = new ArrayList<>(overlayResources.size() + 1);
+        packList.add(primary);
+        packList.addAll(overlayResources);
+        QuickPack.initializeFileTrees(zipFileAccess, packList);
     }
 }

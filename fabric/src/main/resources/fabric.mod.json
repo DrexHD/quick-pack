@@ -18,6 +18,7 @@
 	"mixins": [
 		"quick-pack.mixins.json"
 	],
+	"accessWidener": "quick-pack.classtweaker",
 	"depends": {
 		"fabricloader": ">=0.17.3",
 		"java": ">=17"

@@ -15,6 +15,10 @@ dependencies {
     implementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
 }
 
+loom {
+    accessWidenerPath = rootDir.resolve("common/src/main/resources/quick-pack.classtweaker")
+}
+
 publishMods {
     file.set(tasks.jar.get().archiveFile)
 

@@ -22,6 +22,9 @@ dependencies {
     implementation("io.github.llamalad7:mixinextras-forge:0.5.3")
 }
 
+minecraft {
+    accessTransformer.setFrom(file("src/main/resources/META-INF/accesstransformer.cfg"))
+}
 
 tasks.jar {
     manifest.attributes(mapOf(
