@@ -1,2 +1,4 @@
-classTweaker  v1  official
+classTweaker v2 official
+#? if >= 1.21.1 {
 accessible class net/minecraft/server/packs/FilePackResources$SharedZipFileAccess
+#? }

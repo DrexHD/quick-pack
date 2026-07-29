@@ -2,9 +2,11 @@ package me.drex.quickpack;
 
 import me.drex.quickpack.duck.IFilePackResources;
 import me.drex.quickpack.mixin.FilePackResourcesAccessor;
-import me.drex.quickpack.mixin.SharedZipFileAccessAccessor;
+//? if >= 1.21.1 {
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.FilePackResources;
+//? } else {
+/*import java.util.Locale;
+*///? }
 import net.minecraft.server.packs.PackResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +25,16 @@ public class QuickPack {
     public static final String MOD_ID = "quick-pack";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static void initializeFileTrees(FilePackResources.SharedZipFileAccess zipFileAccess, List<PackResources> packList) {
-        ZipFile zipFile = ((SharedZipFileAccessAccessor) zipFileAccess).invokeGetOrCreateZipFile();
+    public static void initializeFileTrees(ZipFile zipFile, List<PackResources> packList) {
         if (zipFile == null) return;
         Map<String, PackResources> packsByPrefix = new HashMap<>();
         for (PackResources packResource : packList) {
             if (packResource instanceof FilePackResourcesAccessor accessor) {
+                //? if >= 1.21.1 {
                 String prefix = accessor.getPrefix();
+                //? } else {
+                /*String prefix = "";
+                *///? }
                 packsByPrefix.put(prefix, packResource);
             } else {
                 LOGGER.warn("Non-file pack {} in pack list, ignoring", packResource);
@@ -60,11 +65,19 @@ public class QuickPack {
                 continue;
             }
 
+            //? if >= 1.21.1 {
             if (Identifier.isValidNamespace(namespace)) {
+            //? } else {
+            /*if (namespace.equals(namespace.toLowerCase(Locale.ROOT))) {
+            *///? }
                 nameSpacesByPrefix.computeIfAbsent(prefix, s -> new HashMap<>())
                     .computeIfAbsent(type, s -> new HashSet<>()).add(namespace);
             } else {
+                //? if >= 1.21.1 {
                 FilePackResourcesAccessor.getLOGGER().warn("Non [a-z0-9_.-] character in namespace {} in pack {}, ignoring", namespace, zipFile);
+                 //? } else {
+                /*FilePackResourcesAccessor.getLOGGER().warn("Ignored non-lowercase namespace: {} in {}", namespace, zipFile);
+                *///? }
             }
 
             treeSetByPrefix.computeIfAbsent(prefix, s -> new TreeSet<>()).add(path);

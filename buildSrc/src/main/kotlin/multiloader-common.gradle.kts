@@ -1,44 +1,53 @@
 plugins {
-    id("java")
-    id("idea")
-    id("java-library")
+	id("java")
+	id("idea")
+	id("java-library")
 }
 
-version = "${project.property("mod_version")}+${project.property("minecraft_version")}"
-group = "${project.property("maven_group")}"
+version = "${loader}-${modVersion}+${minecraftVersion}"
 
 base {
-    archivesName = "${project.property("archives_base_name")}"
+	archivesName = propOrNull("archives_base_name")
 }
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(25)
+	toolchain.languageVersion = JavaLanguageVersion.of(commonProject.prop("java_version"))
 }
 
 repositories {
     mavenCentral()
+    exclusiveContent {
+        forRepository {
+            maven("https://repo.spongepowered.org/repository/maven-public") { name = "Sponge" }
+        }
+        filter { includeGroupAndSubgroups("org.spongepowered") }
+    }
+	maven("https://maven.fabricmc.net/")
 }
 
 tasks {
 
-    processResources {
-        val expandProps = mapOf(
-            "modVersion" to project.property("mod_version") as String,
-            "minecraftVersion" to project.property("minecraft_version") as String,
-        )
+	processResources {
+		val expandProps = mapOf(
+			"javaVersion" to versionedPropOrNull("java_version"),
+			"modVersion" to modVersion,
+			"minecraftVersion" to versionedPropOrNull("minecraft_version"),
+		).filterValues { it?.isNotEmpty() == true }.mapValues { (_, v) -> v!! }
 
-        filesMatching(
-            listOf(
-                "pack.mcmeta",
-                "fabric.mod.json",
-                "*.mixins.json",
-                "META-INF/mods.toml",
-                "META-INF/neoforge.mods.toml"
-            )
-        ) {
-            expand(expandProps)
-        }
+		val jsonExpandProps = expandProps.mapValues { (_, v) -> v.replace("\n", "\\\\n") }
 
-        inputs.properties(expandProps)
-    }
+			filesMatching(listOf("META-INF/mods.toml", "META-INF/neoforge.mods.toml")) {
+				expand(expandProps)
+			}
+
+		filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "*.mixins.json")) {
+			expand(jsonExpandProps)
+		}
+
+		inputs.properties(expandProps)
+	}
+}
+
+tasks.named("processResources") {
+	dependsOn(common.project.tasks.named("stonecutterGenerate"))
 }

@@ -1,6 +1,6 @@
 modLoader="javafml"
 loaderVersion="*"
-license="MIT"
+license="GPLv3"
 
 [[mods]]
 modId="quick_pack"

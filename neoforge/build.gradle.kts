@@ -1,21 +1,26 @@
 plugins {
-    id("multiloader-loader")
-    id("net.neoforged.gradle.userdev") version "7.1.38"
-}
-
-version = "neoforge-${project.property("mod_version")}+${project.property("minecraft_version")}"
-
-base {
-    archivesName = "${project.property("archives_base_name")}"
+	`multiloader-loader`
+	id("net.neoforged.gradle.userdev") version "7.1.38"
 }
 
 dependencies {
-    implementation("net.neoforged:neoforge:${project.property("neoforge_version")}")
+	implementation("net.neoforged:neoforge:${versionedProp("neoforge")}")
+}
+
+runs {
+	named("client") {
+		ideRunName = "NeoForge Client (${path})"
+	}
+	named("server") {
+		ideRunName = "NeoForge Server (${path})"
+	}
+
+	configureEach {
+		modSource(project.sourceSets.main.get())
+		workingDirectory("run")
+	}
 }
 
 publishMods {
     file.set(tasks.jar.get().archiveFile)
-
-    displayName.set("quick-pack ${version.get()}")
-    modLoaders.addAll("neoforge")
 }

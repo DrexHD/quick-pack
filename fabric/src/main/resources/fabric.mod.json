@@ -7,7 +7,7 @@
 	"authors": [
 		"Drex"
 	],
-	"license": "MIT",
+	"license": "GPLv3",
 	"icon": "assets/quick-pack/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -21,6 +21,6 @@
 	"accessWidener": "quick-pack.classtweaker",
 	"depends": {
 		"fabricloader": ">=0.17.3",
-		"java": ">=17"
+		"java": ">=${javaVersion}"
 	}
 }

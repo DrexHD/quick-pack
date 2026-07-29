@@ -5,6 +5,7 @@
   "mixinextras": {
     "minVersion": "0.5.0"
   },
+  "refmap": "quick_pack.refmap.json",
   "mixins": [
     "FilePackResourcesAccessor",
     "FilePackResourcesMixin",

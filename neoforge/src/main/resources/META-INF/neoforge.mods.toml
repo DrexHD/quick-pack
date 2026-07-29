@@ -1,6 +1,6 @@
 modLoader = "javafml"
 loaderVersion = "*"
-license = "MIT"
+license = "GPLv3"
 issueTrackerURL = "https://github.com/DrexHD/quick-pack/issues"
 
 [[mods]]

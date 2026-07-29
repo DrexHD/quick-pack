@@ -1,27 +1,38 @@
 plugins {
-    id("net.fabricmc.fabric-loom")
-    id("multiloader-loader")
-}
-
-version = "fabric-${project.property("mod_version")}+${project.property("minecraft_version")}"
-
-base {
-    archivesName = "${project.property("archives_base_name")}"
+    id("fabric-loom-compat")
+    `multiloader-loader`
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
+    minecraft("com.mojang:minecraft:$minecraftVersion")
+    if (stonecutter.eval(minecraftVersion, "<=1.21.11")) {
+        mappings(loom.officialMojangMappings())
+    }
 
-    implementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
+    modImplementation("net.fabricmc:fabric-loader:${versionedProp("fabric_loader")}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${versionedProp("fabric_api")}")
 }
 
 loom {
-    accessWidenerPath = rootDir.resolve("common/src/main/resources/quick-pack.classtweaker")
+    accessWidenerPath = sc.process(
+        rootProject.file("common/src/main/resources/quick-pack.classtweaker"),
+        "build/processed.classtweaker"
+    )
+
+    runs {
+        getByName("client") {
+            client()
+            configName = "Fabric Client"
+            ideConfigGenerated(true)
+        }
+        getByName("server") {
+            server()
+            configName = "Fabric Server"
+            ideConfigGenerated(true)
+        }
+    }
 }
 
 publishMods {
-    file.set(tasks.jar.get().archiveFile)
-
-    displayName.set("quick-pack ${version.get()}")
-    modLoaders.addAll("fabric", "quilt")
+    file.set(the<FabricLoomCompatPlugin.FabricExtensions>().modJar.flatMap { it.archiveFile })
 }

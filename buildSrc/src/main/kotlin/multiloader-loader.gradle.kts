@@ -1,7 +1,11 @@
+import org.jetbrains.changelog.Changelog
+import org.jetbrains.changelog.ChangelogPluginExtension
+
 plugins {
 	id("java")
 	id("idea")
     id("multiloader-common")
+    id("org.jetbrains.changelog")
     id("me.modmuss50.mod-publish-plugin")
 }
 
@@ -13,7 +17,7 @@ val commonResources: Configuration by configurations.creating {
 }
 
 dependencies {
-    val commonPath = ":common"
+    val commonPath = common.hierarchy.toString()
 	compileOnly(project(path = commonPath))
     commonJava(project(path = commonPath, configuration = "commonJava"))
     commonResources(project(path = commonPath, configuration = "commonResources"))
@@ -32,19 +36,21 @@ tasks {
 
     publishMods {
         type.set(STABLE)
-        displayName.set("quick-pack ${version.get()}")
-        changelog.set(providers.environmentVariable("CHANGELOG").orElse("No changelog provided"))
+        changelog.set(fetchChangelog())
+
+        displayName.set("quick-pack $loaderName $modVersion+$minecraftVersion")
+        modLoaders.addAll(project.modLoaders)
 
         curseforge {
             accessToken.set(providers.environmentVariable("CURSEFORGE_TOKEN"))
             projectId.set("1380888")
-            minecraftVersions.addAll((project.property("curseforge_minecraft_versions") as String).split(", "))
+            minecraftVersions.add(minecraftVersion)
         }
 
         modrinth {
             accessToken.set(providers.environmentVariable("MODRINTH_TOKEN"))
             projectId.set("pSISfJ4O")
-            minecraftVersions.addAll((project.property("modrinth_minecraft_versions") as String).split(", "))
+            minecraftVersions.add(minecraftVersion)
         }
 
         github {
@@ -52,5 +58,17 @@ tasks {
             repository.set(providers.environmentVariable("GITHUB_REPOSITORY").orElse("DrexHD/quick-pack"))
             commitish.set(providers.environmentVariable("GITHUB_REF_NAME").orElse("main"))
         }
+    }
+}
+
+fun fetchChangelog(): String {
+    val log = rootProject.extensions.getByType<ChangelogPluginExtension>()
+    return if (log.has(modVersion)) {
+        log.renderItem(
+            log.get(modVersion).withHeader(false),
+            Changelog.OutputType.MARKDOWN
+        )
+    } else {
+        ""
     }
 }
