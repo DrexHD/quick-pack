@@ -17,6 +17,7 @@
   },
   "client": [
     "GuiMixin",
-    "LoadingOverlayMixin"
+    "LoadingOverlayMixin",
+    "SpriteLoaderMixin"
   ]
 }
