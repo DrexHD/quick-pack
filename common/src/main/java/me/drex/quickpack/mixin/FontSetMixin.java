@@ -72,4 +72,12 @@ public abstract class FontSetMixin {
         return List.copyOf(usedProviders);
     }
 }
-//? }
+//? } else {
+/*import net.minecraft.server.MinecraftServer;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(MinecraftServer.class)
+public abstract class FontSetMixin {
+
+}
+*///? }

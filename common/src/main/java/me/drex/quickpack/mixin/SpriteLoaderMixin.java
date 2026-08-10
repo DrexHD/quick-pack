@@ -19,7 +19,8 @@ public abstract class SpriteLoaderMixin {
         //? } else {
         /*method = {
             "method_45840", // fabric
-            "lambda$stitch$3" // (neo)forge
+            "lambda$stitch$2", // forge
+            "lambda$stitch$3" // neoforge
         },
         *///? }
         require = 1,

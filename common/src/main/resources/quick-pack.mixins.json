@@ -16,10 +16,8 @@
     "defaultRequire": 1
   },
   "client": [
-    //? if >= 1.21.1 {
     "FontManagerMixin",
     "FontSetMixin",
-    //? }
     "GuiMixin",
     "LoadingOverlayMixin",
     "SpriteLoaderMixin"
