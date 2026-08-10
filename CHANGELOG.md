@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Parallelize texture atlas mipmap generation
+- Optimize font loading logic
 
 ## [1.4.0] - 2026-07-29
 ### Changed
